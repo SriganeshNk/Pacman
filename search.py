@@ -68,26 +68,82 @@ def tinyMazeSearch(problem):
   return  [s,s,w,s,w,w,s,w]
 
 def depthFirstSearch(problem):
-  """
-  Search the deepest nodes in the search tree first [p 85].
-  
-  Your search algorithm needs to return a list of actions that reaches
-  the goal.  Make sure to implement a graph search algorithm [Fig. 3.7].
-  
-  To get started, you might want to try some of these simple commands to
-  understand the search problem that is being passed in:
-  
-  print "Start:", problem.getStartState()
-  print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-  print "Start's successors:", problem.getSuccessors(problem.getStartState())
-  """
+
   "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  dfsStack = Stack() # Main DFS stack
+  histStack = Stack() # Stack which keeps track of path
+  vis = [] # visited array
+  way = [] # Ways returned to the pacman agent
+
+  # starting state
+  state = [(problem.getStartState(), 'Begin')]
+
+  dfsStack.push(state)
+
+  # DFS Algo
+  while not dfsStack.isEmpty():
+    inter_state = dfsStack.pop()
+
+    if not histStack.isEmpty():
+      way = histStack.pop()
+
+    # check if the node is visited or not
+    if problem.isGoalState(inter_state[0][0]):
+      break
+
+    if(vis.count(inter_state[0][0]) == 0):
+      vis.append(inter_state[0][0])
+      succ_nodes = problem.getSuccessors(inter_state[0][0])
+
+      # Find the successor nodes
+      for item in succ_nodes:
+        # Get the co-ordinates and the direction to reach
+        co_ord,_dir = (item[0],item[1])
+        dfsStack.push([(co_ord,_dir)])
+        histStack.push(way + [_dir])
+
+  return way
+
+
+
 
 def breadthFirstSearch(problem):
-  "Search the shallowest nodes in the search tree first. [p 81]"
   "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  bfsQueue = Queue() # Main DFS stack
+  histQueue = Queue() # Stack which keeps track of path
+  vis = [] # visited array
+  way = [] # Ways returned to the pacman agent
+
+  # starting state
+  state = [(problem.getStartState(), 'Begin')]
+
+  bfsQueue.push(state)
+
+  # BFS Algo
+  while not bfsQueue.isEmpty():
+    inter_state = bfsQueue.pop()
+
+    if not histQueue.isEmpty():
+      way = histQueue.pop()
+
+    # check if the node is visited or not
+    if problem.isGoalState(inter_state[0][0]):
+      break
+
+    if(vis.count(inter_state[0][0]) == 0):
+      vis.append(inter_state[0][0])
+      succ_nodes = problem.getSuccessors(inter_state[0][0])
+
+      # Find the successor nodes
+      for item in succ_nodes:
+        # Get the co-ordinates and the direction to reach
+        co_ord,_dir = (item[0],item[1])
+        bfsQueue.push([(co_ord,_dir)])
+        histQueue.push(way + [_dir])
+
+  return way
+
+
       
 def uniformCostSearch(problem):
   "Search the node of least total cost first. "
