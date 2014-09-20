@@ -11,7 +11,11 @@ In search.py, you will implement generic search algorithms which are called
 by Pacman agents (in searchAgents.py).
 """
 
+import math
 import util
+from util import Stack
+from util import Queue
+
 
 class SearchProblem:
   """
