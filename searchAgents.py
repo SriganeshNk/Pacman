@@ -404,7 +404,7 @@ def cornersHeuristic(state, problem):
 def findNearestGoal(pos, goal):
     goalIndex = -1
     dist=[]
-    for i in range(len(corners)):
+    for i in range(len(goal)):
         #Manhattan Heuristic
         temp_dist = abs(pos[0]-goal[i][0]) + abs(pos[1]-goal[i][1])
         if len(dist)==0 or temp_dist > 0 and temp_dist < min(dist):
