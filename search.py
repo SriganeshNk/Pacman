@@ -11,11 +11,7 @@ In search.py, you will implement generic search algorithms which are called
 by Pacman agents (in searchAgents.py).
 """
 
-import math
 import util
-from util import Stack
-from util import Queue
-
 
 class SearchProblem:
   """
@@ -71,88 +67,6 @@ def tinyMazeSearch(problem):
   w = Directions.WEST
   return  [s,s,w,s,w,w,s,w]
 
-def depthFirstSearch(problem):
-
-  "*** YOUR CODE HERE ***"
-  dfsStack = Stack() # Main DFS stack
-  histStack = Stack() # Stack which keeps track of path
-  vis = [] # visited array
-  way = [] # Ways returned to the pacman agent
-
-  # starting state
-  state = [(problem.getStartState(), 'Begin')]
-
-  dfsStack.push(state)
-
-  # DFS Algo
-  while not dfsStack.isEmpty():
-    inter_state = dfsStack.pop()
-
-    if not histStack.isEmpty():
-      way = histStack.pop()
-
-    # check if the node is visited or not
-    if problem.isGoalState(inter_state[0][0]):
-      break
-
-    if(vis.count(inter_state[0][0]) == 0):
-      vis.append(inter_state[0][0])
-      succ_nodes = problem.getSuccessors(inter_state[0][0])
-
-      # Find the successor nodes
-      for item in succ_nodes:
-        # Get the co-ordinates and the direction to reach
-        co_ord,_dir = (item[0],item[1])
-        dfsStack.push([(co_ord,_dir)])
-        histStack.push(way + [_dir])
-
-  return way
-
-
-
-
-def breadthFirstSearch(problem):
-  "*** YOUR CODE HERE ***"
-  bfsQueue = Queue() # Main DFS stack
-  histQueue = Queue() # Stack which keeps track of path
-  vis = [] # visited array
-  way = [] # Ways returned to the pacman agent
-
-  # starting state
-  state = [(problem.getStartState(), 'Begin')]
-
-  bfsQueue.push(state)
-
-  # BFS Algo
-  while not bfsQueue.isEmpty():
-    inter_state = bfsQueue.pop()
-
-    if not histQueue.isEmpty():
-      way = histQueue.pop()
-
-    # check if the node is visited or not
-    if problem.isGoalState(inter_state[0][0]):
-      break
-
-    if(vis.count(inter_state[0][0]) == 0):
-      vis.append(inter_state[0][0])
-      succ_nodes = problem.getSuccessors(inter_state[0][0])
-
-      # Find the successor nodes
-      for item in succ_nodes:
-        # Get the co-ordinates and the direction to reach
-        co_ord,_dir = (item[0],item[1])
-        bfsQueue.push([(co_ord,_dir)])
-        histQueue.push(way + [_dir])
-
-  return way
-
-
-      
-def uniformCostSearch(problem):
-  "Search the node of least total cost first. "
-  "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
   """
@@ -161,10 +75,104 @@ def nullHeuristic(state, problem=None):
   """
   return 0
 
+def genericsearch(state, problem, fringe, method, heuristic=nullHeuristic):
+  from util import Stack
+  from util import Queue
+  from util import PriorityQueue
+  visited = list()
+  way = list()
+  history = list()
+
+  if method=="bfs":
+    history = Queue()
+  if method=="dfs":
+    history = Stack()
+
+  if method=="other":
+  	fringe.push((state,way),problem.getCostOfActions(way))
+  else:
+    fringe.push(state)
+
+  while not fringe.isEmpty():
+    if method =="other":
+      nextstate,directions = fringe.pop()
+      if problem.isGoalState(nextstate):
+         return directions
+    else:
+      nextstate = fringe.pop()
+      if not history.isEmpty():
+        way=history.pop()
+      if problem.isGoalState(nextstate):
+        return way
+    
+    if nextstate not in visited:
+      visited.append(nextstate)
+      successor = problem.getSuccessors(nextstate)
+      print "currentstate:", nextstate
+      for each in successor:
+        print each
+        if method == "other":
+          fringe.push((each[0],directions+[each[1]]), problem.getCostOfActions(directions+[each[1]])+heuristic(each[0],problem))
+        else:
+          fringe.push(each[0])
+          history.push(way+[each[1]])
+
+def depthFirstSearch(problem):
+  """
+  Search the deepest nodes in the search tree first [p 85].
+  
+  Your search algorithm needs to return a list of actions that reaches
+  the goal.  Make sure to implement a graph search algorithm [Fig. 3.7].
+  
+  To get started, you might want to try some of these simple commands to
+  understand the search problem that is being passed in:
+  
+  print "Start:", problem.getStartState()
+  print "Is the start a goal?", problem.isGoalState(problem.getStartState())
+  print "Start's successors:", problem.getSuccessors(problem.getStartState())
+  """
+  "*** YOUR CODE HERE ***"
+  from util import Stack
+  start = problem.getStartState();
+  fringe = Stack()
+  method="dfs"
+  way = genericsearch(start, problem, fringe, method);
+  return way
+  #util.raiseNotDefined()
+
+def breadthFirstSearch(problem):
+  "Search the shallowest nodes in the search tree first. [p 81]"
+  "*** YOUR CODE HERE ***"
+  from util import Queue
+  start = problem.getStartState();
+  fringe = Queue()
+  method="bfs"
+  way = genericsearch(start, problem, fringe, method);
+  return way
+  #util.raiseNotDefined()
+      
+def uniformCostSearch(problem):
+  "Search the node of least total cost first. "
+  "*** YOUR CODE HERE ***"
+  from util import PriorityQueue
+  start = problem.getStartState();
+  fringe= PriorityQueue()
+  method= "other"
+  way = genericsearch(start, problem, fringe, method);
+  return way
+  #util.raiseNotDefined()
+
+
 def aStarSearch(problem, heuristic=nullHeuristic):
   "Search the node that has the lowest combined cost and heuristic first."
   "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  from util import PriorityQueue
+  start = problem.getStartState();
+  fringe= PriorityQueue()
+  method= "other"
+  way = genericsearch(start, problem, fringe, method, heuristic);
+  return way
+  """util.raiseNotDefined()"""
     
   
 # Abbreviations
