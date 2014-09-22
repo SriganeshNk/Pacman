@@ -503,7 +503,34 @@ def foodHeuristic(state, problem):
   """
   position, foodGrid = state
   "*** YOUR CODE HERE ***"
-  return 0
+  foodPositions = []
+  for each in foodGrid.asList():
+    foodPositions.append(each)
+  cummdistance = 0
+  dist_list = []
+
+  while len(foodPositions) != 0:
+    foodIndex = findClosestfood(position, foodPositions)
+    temp = abs(position[0]-foodPositions[foodIndex][0])+abs(position[1]-foodPositions[foodIndex][1])
+    dist_list.append(temp)
+    cummdistance += temp
+    foodPositions.remove(foodPositions[foodIndex])
+
+  #if len(dist_list)>0:
+   # cummdistance -= min(dist_list)
+  return cummdistance
+
+  #return 0
+    
+def findClosestfood(pos, food):
+  foodIndex = -1
+  dist = []
+  for i in range(len(food)):
+    temp_dist = abs(pos[0]-food[i][0])+abs(pos[1]-food[i][1])
+    if len(dist)==0 or temp_dist<min(dist) and temp_dist>0:
+      dist.append(temp_dist)
+      foodIndex = i
+  return foodIndex
   
 class ClosestDotSearchAgent(SearchAgent):
   "Search for all food using a sequence of searches"
