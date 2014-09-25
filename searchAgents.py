@@ -246,6 +246,12 @@ def manhattanHeuristic(position, problem, info={}):
   xy2 = problem.goal
   return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
 
+# Slightly modified version of mymanhattanHeuristic
+def mymanhattanHeuristic(position, target):
+  xy1 = position
+  xy2 = target
+  return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
 def euclideanHeuristic(position, problem, info={}):
   "The Euclidean distance heuristic for a PositionSearchProblem"
   xy1 = position
@@ -502,36 +508,41 @@ def foodHeuristic(state, problem):
   Subsequent calls to this heuristic can access problem.heuristicInfo['wallCount']
   """
   position, foodGrid = state
-  "*** YOUR CODE HERE ***"
   foodPositions = []
+  
+  # Put it in a list
   for each in foodGrid.asList():
     foodPositions.append(each)
+
+  # Final distance to be returned
   cummdistance = 0
-  dist_list = []
 
   while len(foodPositions) != 0:
-    foodIndex = findClosestfood(position, foodPositions)
-    temp = abs(position[0]-foodPositions[foodIndex][0])+abs(position[1]-foodPositions[foodIndex][1])
-    dist_list.append(temp)
-    cummdistance += temp
-    foodPositions.remove(foodPositions[foodIndex])
+    # Returns closes food position and its distance
+    min_food,min_dist = findClosestfood(position, foodPositions)
+    
+    # Remove the position because food is consumed
+    foodPositions.remove(min_food)
+ 
+    # Add the distance and update the position
+    cummdistance += min_dist
+    position = min_food
 
-  #if len(dist_list)>0:
-   # cummdistance -= min(dist_list)
   return cummdistance
 
-  #return 0
-    
-def findClosestfood(pos, food):
-  foodIndex = -1
-  dist = []
-  for i in range(len(food)):
-    temp_dist = abs(pos[0]-food[i][0])+abs(pos[1]-food[i][1])
-    if len(dist)==0 or temp_dist<min(dist) and temp_dist>0:
-      dist.append(temp_dist)
-      foodIndex = i
-  return foodIndex
-  
+def findClosestfood(pos, foodList):
+
+  closest_distance = 9999
+  closest_position = (0,0)
+
+  for food in foodList:
+    temp = mymanhattanHeuristic(pos, food)
+    if temp < closest_distance:
+      closest_distance = temp
+      closest_position = food
+
+  return (closest_position, closest_distance)
+
 class ClosestDotSearchAgent(SearchAgent):
   "Search for all food using a sequence of searches"
   def registerInitialState(self, state):

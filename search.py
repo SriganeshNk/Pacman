@@ -12,6 +12,9 @@ by Pacman agents (in searchAgents.py).
 """
 
 import util
+from util import Stack
+from util import Queue
+from util import PriorityQueue
 
 class SearchProblem:
   """
@@ -75,18 +78,9 @@ def nullHeuristic(state, problem=None):
   """
   return 0
 
-def genericsearch(state, problem, fringe, method, heuristic=nullHeuristic):
-  from util import Stack
-  from util import Queue
-  from util import PriorityQueue
+def genericsearch(state, problem, fringe, history, method, heuristic=nullHeuristic):
   visited = list()
   way = list()
-  history = list()
-
-  if method=="bfs":
-    history = Queue()
-  if method=="dfs":
-    history = Stack()
 
   if method=="other":
   	fringe.push((state,way),problem.getCostOfActions(way))
@@ -118,63 +112,17 @@ def genericsearch(state, problem, fringe, method, heuristic=nullHeuristic):
           history.push(way+[each[1]])
 
 def depthFirstSearch(problem):
-  """
-  Search the deepest nodes in the search tree first [p 85].
-  
-  Your search algorithm needs to return a list of actions that reaches
-  the goal.  Make sure to implement a graph search algorithm [Fig. 3.7].
-  
-  To get started, you might want to try some of these simple commands to
-  understand the search problem that is being passed in:
-  
-  print "Start:", problem.getStartState()
-  print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-  print "Start's successors:", problem.getSuccessors(problem.getStartState())
-  """
-  "*** YOUR CODE HERE ***"
-  from util import Stack
-  start = problem.getStartState();
-  fringe = Stack()
-  method="dfs"
-  way = genericsearch(start, problem, fringe, method);
-  return way
-  #util.raiseNotDefined()
+  return genericsearch(problem.getStartState(), problem, Stack(), Stack(), "dfs");
 
 def breadthFirstSearch(problem):
-  "Search the shallowest nodes in the search tree first. [p 81]"
-  "*** YOUR CODE HERE ***"
-  from util import Queue
-  start = problem.getStartState();
-  fringe = Queue()
-  method="bfs"
-  way = genericsearch(start, problem, fringe, method);
-  return way
-  #util.raiseNotDefined()
+  return genericsearch(problem.getStartState(), problem, Queue(), Queue(), "bfs");
       
 def uniformCostSearch(problem):
-  "Search the node of least total cost first. "
-  "*** YOUR CODE HERE ***"
-  from util import PriorityQueue
-  start = problem.getStartState();
-  fringe= PriorityQueue()
-  method= "other"
-  way = genericsearch(start, problem, fringe, method);
-  return way
-  #util.raiseNotDefined()
-
+  return genericsearch(problem.getStartState(), problem, PriorityQueue(), list(), "other");
 
 def aStarSearch(problem, heuristic=nullHeuristic):
-  "Search the node that has the lowest combined cost and heuristic first."
-  "*** YOUR CODE HERE ***"
-  from util import PriorityQueue
-  start = problem.getStartState();
-  fringe= PriorityQueue()
-  method= "other"
-  way = genericsearch(start, problem, fringe, method, heuristic);
-  return way
-  """util.raiseNotDefined()"""
+  return genericsearch(problem.getStartState(), problem, PriorityQueue(), list(), "other", heuristic);
     
-  
 # Abbreviations
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
