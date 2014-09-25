@@ -51,6 +51,20 @@ class GoWestAgent(Agent):
 #       after you fill in parts of search.py          #
 #######################################################
 
+def findClosest(pos, foodList):
+
+  closest_distance = 9999
+  closest_position = (0,0)
+
+  for food in foodList:
+    temp = mymanhattanHeuristic(pos, food)
+    if temp < closest_distance:
+      closest_distance = temp
+      closest_position = food
+      index = foodList.index(food)
+
+  return (closest_position, closest_distance, index)
+
 class SearchAgent(Agent):
   """
   This very general search agent finds a path using a supplied search algorithm for a
@@ -387,38 +401,23 @@ def cornersHeuristic(state, problem):
   """
   corners = problem.corners # These are the corner coordinates
   walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-  
-  "*** YOUR CODE HERE ***"
-  pos = state[0] 
+ 
+  pos = state[0]
   cummdistance = 0
   goalstates = [] #list of unvisited goals.
   
-  for i in range(len(problem.corners)):
-      if not state[1][i]:
-          goalstates.append(problem.corners[i])
+  for i,j in zip(corners, state[1]):
+      if not j:
+          goalstates.append(i)
  
   while len(goalstates) != 0: 
-    j = findNearestGoal(pos, goalstates)
+    min_position,min_dist,j = findClosest(pos, goalstates)
     #Manhattan Heuristic
     cummdistance += abs(pos[0]-goalstates[j][0])+abs(pos[1]-goalstates[j][1])
     pos = goalstates[j] 
     goalstates.remove(goalstates[j])
          
   return cummdistance
-
-#The index of the goal state closest to the position is
-def findNearestGoal(pos, goal):
-    goalIndex = -1
-    dist=[]
-    for i in range(len(goal)):
-        #Manhattan Heuristic
-        temp_dist = abs(pos[0]-goal[i][0]) + abs(pos[1]-goal[i][1])
-        if len(dist)==0 or temp_dist > 0 and temp_dist < min(dist):
-          dist.append(temp_dist)
-          goalIndex = i
-    return goalIndex
-
-
 
 class AStarCornersAgent(SearchAgent):
   "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -519,7 +518,7 @@ def foodHeuristic(state, problem):
 
   while len(foodPositions) != 0:
     # Returns closes food position and its distance
-    min_food,min_dist = findClosestfood(position, foodPositions)
+    min_food,min_dist,index = findClosest(position, foodPositions)
     
     # Remove the position because food is consumed
     foodPositions.remove(min_food)
@@ -530,18 +529,6 @@ def foodHeuristic(state, problem):
 
   return cummdistance
 
-def findClosestfood(pos, foodList):
-
-  closest_distance = 9999
-  closest_position = (0,0)
-
-  for food in foodList:
-    temp = mymanhattanHeuristic(pos, food)
-    if temp < closest_distance:
-      closest_distance = temp
-      closest_position = food
-
-  return (closest_position, closest_distance)
 
 class ClosestDotSearchAgent(SearchAgent):
   "Search for all food using a sequence of searches"
