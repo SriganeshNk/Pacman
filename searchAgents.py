@@ -46,11 +46,6 @@ class GoWestAgent(Agent):
     else:
       return Directions.STOP
 
-#######################################################
-# This portion is written for you, but will only work #
-#       after you fill in parts of search.py          #
-#######################################################
-
 def findClosest(pos, foodList):
 
   closest_distance = 9999
@@ -261,6 +256,8 @@ def manhattanHeuristic(position, problem, info={}):
   return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
 
 # Slightly modified version of mymanhattanHeuristic
+# The above takes input as a problem. This cannot be used
+# if we need to apply the heuristic for two positions
 def mymanhattanHeuristic(position, target):
   xy1 = position
   xy2 = target
@@ -270,6 +267,15 @@ def euclideanHeuristic(position, problem, info={}):
   "The Euclidean distance heuristic for a PositionSearchProblem"
   xy1 = position
   xy2 = problem.goal
+  return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
+
+# Slightly modified version of euclideanHeuristic
+# The above takes input as a problem. This cannot be used
+# if we need to apply the heuristic for two positions
+def myeuclideanHeuristic(position, target):
+  "The Euclidean distance heuristic for a PositionSearchProblem"
+  xy1 = position
+  xy2 = target
   return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 
 #####################################################
@@ -320,19 +326,15 @@ class CornersProblem(search.SearchProblem):
   #goal state is any state where all corners are visited. So for all (x,y)
   # the state ((x, y), [True, True, True, True]) is a goal state"""
   def isGoalState(self, state):
-    """Returns whether this search state is a goal state of the problem"
-    "*** YOUR CODE HERE ***"""
-    if state[0] == self.corners[0]:
-        state[1][0] = True
-    if state[0] == self.corners[1]:
-        state[1][1] = True
-    if state[0] == self.corners[2]:
-        state[1][2] = True
-    if state[0] == self.corners[3]:
-        state[1][3] = True
-    if state[1][0] == True and state[1][1] ==  True and state[1][2] == True and state[1][3] == True:
-        return True
-    return False
+    # Returns whether this search state is a goal state of the problem
+    if state[0] in self.corners:
+      index = self.corners.index(state[0])
+      state[1][index] = True
+
+    if False in state[1]:
+      return False
+
+    return True
  
   def getSuccessors(self, state):
     """
@@ -406,10 +408,13 @@ def cornersHeuristic(state, problem):
   cummdistance = 0
   goalstates = [] #list of unvisited goals.
   
+  # If state is false, then that corner is not visited
+  # and hence we add it to unvisited state
   for i,j in zip(corners, state[1]):
       if not j:
           goalstates.append(i)
  
+  # Traverse the states
   while len(goalstates) != 0: 
     min_position,min_dist,j = findClosest(pos, goalstates)
     #Manhattan Heuristic

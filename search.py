@@ -83,7 +83,7 @@ def genericsearch(state, problem, fringe, history, method, heuristic=nullHeurist
   way = list()
 
   if method=="other":
-  	fringe.push((state,way),problem.getCostOfActions(way))
+    fringe.push((state,way),problem.getCostOfActions(way))
   else:
     fringe.push(state)
 
@@ -100,16 +100,18 @@ def genericsearch(state, problem, fringe, history, method, heuristic=nullHeurist
         return way
     
     if nextstate not in visited:
+      # Mark the node visited
       visited.append(nextstate)
+
+      # Get the successors for the current node
       successor = problem.getSuccessors(nextstate)
-      print "currentstate:", nextstate
+
       for each in successor:
-        print each
         if method == "other":
           fringe.push((each[0],directions+[each[1]]), problem.getCostOfActions(directions+[each[1]])+heuristic(each[0],problem))
         else:
           fringe.push(each[0])
-          history.push(way+[each[1]])
+          history.push(way+[each[1]]) # Store the history
 
 def depthFirstSearch(problem):
   return genericsearch(problem.getStartState(), problem, Stack(), Stack(), "dfs");
